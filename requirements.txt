@@ -22,6 +22,7 @@ google-api-python-client
 
 # Dashboard
 streamlit
+plotly
 
 # Scheduling
 APScheduler
