@@ -5,9 +5,10 @@ from ..config.settings import settings
 
 class LLMProcessor:
     def __init__(self):
-        self.api_key = settings.gemini_api_key
-        if self.api_key:
-            genai.configure(api_key=self.api_key)
+        self.api_keys = settings.get_gemini_api_keys_list
+        self.current_key_idx = 0
+        if self.api_keys:
+            genai.configure(api_key=self.api_keys[0])
             self.model = genai.GenerativeModel('gemini-2.5-flash')
         else:
             self.model = None
@@ -29,6 +30,10 @@ class LLMProcessor:
             
         enriched_jobs = []
         for job in jobs:
+            if self.api_keys:
+                self.current_key_idx = (self.current_key_idx + 1) % len(self.api_keys)
+                genai.configure(api_key=self.api_keys[self.current_key_idx])
+                
             try:
                 result = self._analyze_job(job)
                 job.update(result)
