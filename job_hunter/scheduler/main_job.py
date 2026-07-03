@@ -5,7 +5,6 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from job_hunter.database.models import init_db
-from job_hunter.scrapers.dummy_scraper import DummyScraper
 from job_hunter.scrapers.yc_scraper import YCPlaywrightScraper
 from job_hunter.processors.data_cleaner import DataCleaner
 from job_hunter.processors.llm_processor import LLMProcessor
@@ -17,7 +16,7 @@ def run_job_hunter():
     init_db()
     
     print("Starting scrapers...")
-    scrapers = [DummyScraper(), YCPlaywrightScraper()]
+    scrapers = [YCPlaywrightScraper()]
     
     raw_jobs = []
     for scraper in scrapers:
