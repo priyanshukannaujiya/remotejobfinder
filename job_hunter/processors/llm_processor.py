@@ -41,10 +41,13 @@ class LLMProcessor:
     def _analyze_job(self, job: Dict) -> Dict:
         system_prompt = (
             "You are an AI assistant helping a data engineer find a job. "
-            "You will be given a job description and the candidate's resume summary. "
+            "You must STRICTLY evaluate the job against these criteria:\n"
+            "1. MUST NOT require more than 2 years of experience. If it requires 3+ years, set resume_match_score to 0.\n"
+            "2. Ideally Remote or in India. Prioritize Remote Internship, Data Engineering Internship, or Fresher roles.\n"
+            "3. The job should match common Data Engineering keywords (e.g. Data Engineer, ETL Developer, Big Data, Snowflake, Spark, Python SQL).\n"
             "Return a JSON object with exactly these fields:\n"
-            "- summary: A string with exactly 3 bullet points summarizing the job.\n"
-            "- resume_match_score: An integer from 0 to 100 representing how well the candidate fits.\n"
+            "- summary: A list of 3 string bullet points summarizing the job.\n"
+            "- resume_match_score: An integer from 0 to 100 representing how well the candidate fits (0 if senior/requires >2 yrs).\n"
             "- match_explanation: A short string explaining the score."
         )
         

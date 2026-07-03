@@ -1,0 +1,48 @@
+{
+  "primary_keywords": [
+    "Data Engineer", "Junior Data Engineer", "Associate Data Engineer", 
+    "Graduate Data Engineer", "Entry Level Data Engineer", 
+    "Data Engineering Intern", "Data Engineering Internship", 
+    "Data Engineer Trainee", "Data Engineering Apprentice"
+  ],
+  "etl_pipeline_roles": [
+    "ETL Developer", "ETL Engineer", "Junior ETL Developer", 
+    "Data Integration Engineer", "Data Integration Developer", 
+    "Data Pipeline Engineer", "Data Platform Engineer", 
+    "Data Warehouse Developer", "Data Warehouse Engineer"
+  ],
+  "big_data_roles": [
+    "Big Data Engineer", "Big Data Developer", "Hadoop Developer", 
+    "Spark Developer", "PySpark Developer", "Data Processing Engineer", 
+    "Distributed Systems Engineer (Data)"
+  ],
+  "cloud_data_roles": [
+    "Cloud Data Engineer", "Azure Data Engineer", "AWS Data Engineer", 
+    "Google Cloud Data Engineer", "Snowflake Developer", 
+    "Snowflake Data Engineer", "Databricks Engineer"
+  ],
+  "sql_database_roles": [
+    "SQL Developer", "Database Developer", "Database Engineer", 
+    "Database Programmer", "Data Migration Engineer", "Data Migration Developer"
+  ],
+  "analytics_roles": [
+    "Analytics Engineer", "BI Developer", "Business Intelligence Engineer", 
+    "Data Analyst (SQL Python ETL)", "Analytics Developer"
+  ],
+  "ai_ml_data_roles": [
+    "AI Data Engineer", "ML Data Engineer", 
+    "Machine Learning Infrastructure Engineer", "Data Infrastructure Engineer", 
+    "Data Operations Engineer", "DataOps Engineer"
+  ],
+  "fresher_intern_keywords": [
+    "Fresher Data Engineer", "Graduate Engineer Trainee Data", 
+    "Entry Level Data Engineer", "Data Intern", "Data Engineering Intern", 
+    "Data Platform Intern", "ETL Intern", "Big Data Intern", "Data Warehouse Intern"
+  ],
+  "skill_keywords": [
+    "Python SQL Spark", "Python SQL ETL", "Python Airflow", "Python PySpark", 
+    "SQL ETL", "Snowflake SQL", "Databricks Spark", "Azure Data Factory", 
+    "AWS Glue", "Apache Kafka", "Apache Airflow", "Apache Spark", "dbt", 
+    "Data Pipelines", "Data Warehousing"
+  ]
+}
