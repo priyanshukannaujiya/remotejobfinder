@@ -13,7 +13,7 @@ st.title("🚀 Data Engineering Job Hunter Dashboard")
 data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'data')
 db_path = os.path.join(data_dir, 'jobs.db')
 
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=60)
 def load_data():
     if not os.path.exists(db_path):
         return pd.DataFrame()
