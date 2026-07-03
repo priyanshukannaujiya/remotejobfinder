@@ -23,9 +23,17 @@ class DataCleaner:
         if 'company' in df.columns:
             df['company'] = df['company'].astype(str).str.strip().str.title()
             
-        # Clean URLs (remove tracking parameters)
+        # Clean URLs (remove tracking parameters but keep IDs)
         if 'apply_link' in df.columns:
-            df['apply_link'] = df['apply_link'].apply(lambda x: x.split('?')[0] if isinstance(x, str) else x)
+            def clean_url(url):
+                if not isinstance(url, str): return url
+                # Remove common tracking patterns if present
+                if '?utm_' in url:
+                    url = url.split('?utm_')[0]
+                if '&utm_' in url:
+                    url = url.split('&utm_')[0]
+                return url
+            df['apply_link'] = df['apply_link'].apply(clean_url)
             
         # Convert NaN to None for database compatibility
         df = df.where(pd.notnull(df), None)

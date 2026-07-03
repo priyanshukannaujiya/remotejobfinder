@@ -59,4 +59,7 @@ class LLMProcessor:
         )
         
         content = response.text
-        return json.loads(content)
+        data = json.loads(content)
+        if isinstance(data.get('summary'), list):
+            data['summary'] = '\n'.join(f"- {item}" for item in data['summary'])
+        return data
