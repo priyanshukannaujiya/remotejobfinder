@@ -36,6 +36,19 @@ class YCPlaywrightScraper(BaseScraper):
                     if link and not link.startswith("http"):
                         link = "https://news.ycombinator.com/" + link
                         
+                    # Check post age to ensure it's recent (past 24 hours)
+                    try:
+                        next_row = row.evaluate_handle("el => el.nextElementSibling")
+                        if next_row:
+                            age_elem = next_row.as_element().query_selector(".age")
+                            if age_elem:
+                                age_text = age_elem.inner_text().lower()
+                                # if it says '2 days ago' or '3 days ago', skip it
+                                if "day" in age_text and not age_text.startswith("1 day"):
+                                    continue
+                    except Exception:
+                        pass # Ignore parsing errors on age and continue safely
+                        
                     # Fetch full job description by visiting the link
                     full_desc_text = title_text
                     try:

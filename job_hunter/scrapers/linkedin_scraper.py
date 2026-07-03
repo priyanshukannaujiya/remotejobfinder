@@ -19,9 +19,10 @@ class LinkedInScraper(BaseScraper):
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
         }
         # Searching for Data Engineer in India and Worldwide Remote
+        # f_TPR=r86400 ensures we ONLY get jobs posted in the Past 24 Hours
         self.search_urls = [
-            f"{self.base_url}?keywords=Data%20Engineer&location=India&f_WT=2", # Remote India
-            f"{self.base_url}?keywords=Data%20Engineer&location=India&f_E=1,2", # Intern/Entry Level India
+            f"{self.base_url}?keywords=Data%20Engineer&location=India&f_WT=2&f_TPR=r86400", # Remote India (Past 24h)
+            f"{self.base_url}?keywords=Data%20Engineer&location=India&f_E=1,2&f_TPR=r86400", # Intern/Entry Level India (Past 24h)
         ]
 
     def fetch_jobs(self) -> List[Dict]:
