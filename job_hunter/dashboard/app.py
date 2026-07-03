@@ -71,6 +71,12 @@ if show_remote_only:
 if show_interns_only:
     filtered_df = filtered_df[filtered_df['internship'] == True]
 
+if 'source' in df.columns:
+    sources = sorted(df['source'].dropna().unique().tolist())
+    selected_sources = st.sidebar.multiselect("Filter by Source", options=sources, default=sources)
+    if selected_sources:
+        filtered_df = filtered_df[filtered_df['source'].isin(selected_sources)]
+
 # Visualizations
 col_v1, col_v2 = st.columns(2)
 
