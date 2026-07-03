@@ -31,7 +31,9 @@ class LinkedInScraper(BaseScraper):
         
         for url in self.search_urls:
             try:
+                print(f"Fetching URL: {url}")
                 response = requests.get(url, headers=self.headers, timeout=10)
+                print(f"Got response: {response.status_code}")
                 if response.status_code != 200:
                     print(f"LinkedIn scraper failed with status code {response.status_code}")
                     continue
