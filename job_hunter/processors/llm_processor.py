@@ -3,6 +3,9 @@ from typing import Dict, List
 import google.generativeai as genai
 from openai import OpenAI
 from ..config.settings import settings
+from ..utils.logger import setup_logger
+
+logger = setup_logger(__name__)
 
 class LLMProcessor:
     def __init__(self):
@@ -149,7 +152,7 @@ class LLMProcessor:
         and returns the enriched job list.
         """
         if not self.gemini_model and not self.openai_client:
-            print("No Gemini or OpenRouter API Key found. Skipping LLM processing.")
+            logger.warning("No Gemini or OpenRouter API Key found. Skipping LLM processing.")
             return jobs
             
         enriched_jobs = []
@@ -164,7 +167,7 @@ class LLMProcessor:
                 result = self._analyze_job(job)
                 job.update(result)
             except Exception as e:
-                print(f"Error processing job {job.get('job_id')}: {e}")
+                logger.error(f"Error processing job {job.get('job_id')}: {e}")
             enriched_jobs.append(job)
             
         return enriched_jobs
@@ -211,7 +214,30 @@ class LLMProcessor:
             )
             
         content = response.text if not self.openai_client else content
-        data = json.loads(content)
+        
+        # Robust JSON parsing
+        try:
+            # Sometime LLMs wrap json in markdown blocks like ```json ... ```
+            if "```json" in content:
+                content = content.split("```json")[1].split("```")[0].strip()
+            elif "```" in content:
+                content = content.split("```")[1].split("```")[0].strip()
+                
+            data = json.loads(content)
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse JSON from LLM: {e}. Raw content: {content[:200]}...")
+            data = {
+                "summary": "Failed to extract summary.",
+                "resume_match_score": 0,
+                "match_explanation": "Failed to parse LLM response.",
+                "missing_skills": [],
+                "resume_improvements": "",
+                "resume_summary": "",
+                "cover_letter": "",
+                "interview_questions": [],
+                "recommended_projects": []
+            }
+            
         for field in ['summary', 'missing_skills', 'interview_questions', 'recommended_projects']:
             if isinstance(data.get(field), list):
                 data[field] = '\n'.join(f"- {item}" for item in data[field])

@@ -14,13 +14,6 @@ openai
 # Database
 sqlalchemy
 
-# Integrations (Email, Google Sheets)
-gspread
-google-auth
-google-auth-oauthlib
-google-auth-httplib2
-google-api-python-client
-
 # Dashboard
 streamlit
 plotly

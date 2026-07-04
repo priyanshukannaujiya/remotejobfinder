@@ -6,6 +6,9 @@ from typing import List, Dict
 import os
 from ..config.settings import settings
 from ..database.models import data_dir
+from ..utils.logger import setup_logger
+
+logger = setup_logger(__name__)
 
 class EmailSender:
     def __init__(self):
@@ -74,7 +77,7 @@ class EmailSender:
         
     def send_report(self, jobs: List[Dict]):
         if not jobs:
-            print("No jobs to email.")
+            logger.info("No jobs to email.")
             return
             
         recipients = [
@@ -108,9 +111,9 @@ class EmailSender:
             server.login(self.email, self.password)
             server.send_message(msg)
             server.quit()
-            print("Email report sent successfully!")
+            logger.info("Email report sent successfully!")
         except Exception as e:
-            print(f"Failed to send email: {e}")
+            logger.error(f"Failed to send email: {e}")
 
     def send_dream_job_alert(self, job: Dict):
         recipient = "kannaujiyapriyanshu111@gmail.com"
@@ -160,6 +163,6 @@ class EmailSender:
             server.login(self.email, self.password)
             server.send_message(msg)
             server.quit()
-            print(f"Dream job alert sent to {recipient}!")
+            logger.info(f"Dream job alert sent to {recipient}!")
         except Exception as e:
-            print(f"Failed to send dream job alert: {e}")
+            logger.error(f"Failed to send dream job alert: {e}")

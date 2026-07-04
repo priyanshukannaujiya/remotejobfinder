@@ -100,12 +100,28 @@ display_cols = [
     'company', 'title', 'location', 'experience_required', 'resume_match_score', 
     'skills', 'salary', 'remote', 'internship', 'source', 'apply_link', 
     'summary', 'match_explanation', 'missing_skills', 'resume_improvements', 
-    'resume_summary', 'cover_letter', 'interview_questions', 'recommended_projects', 
-    'full_job_description'
+    'resume_summary', 'cover_letter', 'interview_questions', 'recommended_projects'
 ]
 # Ensure columns exist before displaying
 display_cols = [c for c in display_cols if c in filtered_df.columns]
-st.dataframe(filtered_df[display_cols].sort_values(by='resume_match_score', ascending=False, na_position='last'))
+
+st.dataframe(
+    filtered_df[display_cols].sort_values(by='resume_match_score', ascending=False, na_position='last'),
+    use_container_width=True,
+    column_config={
+        "apply_link": st.column_config.LinkColumn("Apply Link"),
+        "resume_match_score": st.column_config.ProgressColumn(
+            "Match Score",
+            help="AI generated match score based on resume",
+            format="%f",
+            min_value=0,
+            max_value=100,
+        ),
+        "remote": st.column_config.CheckboxColumn("Remote"),
+        "internship": st.column_config.CheckboxColumn("Internship"),
+    },
+    hide_index=True
+)
 
 # Downloads
 st.sidebar.markdown("---")
