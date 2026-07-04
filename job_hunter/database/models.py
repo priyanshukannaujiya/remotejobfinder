@@ -33,6 +33,12 @@ class Job(Base):
     summary = Column(Text, nullable=True)
     resume_match_score = Column(Float, nullable=True)
     match_explanation = Column(Text, nullable=True)
+    missing_skills = Column(Text, nullable=True)
+    resume_improvements = Column(Text, nullable=True)
+    resume_summary = Column(Text, nullable=True)
+    cover_letter = Column(Text, nullable=True)
+    interview_questions = Column(Text, nullable=True)
+    recommended_projects = Column(Text, nullable=True)
     
     timestamp = Column(DateTime, default=datetime.datetime.utcnow)
 

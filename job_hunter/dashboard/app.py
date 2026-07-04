@@ -99,7 +99,9 @@ st.subheader("Job Listings")
 display_cols = [
     'company', 'title', 'location', 'experience_required', 'resume_match_score', 
     'skills', 'salary', 'remote', 'internship', 'source', 'apply_link', 
-    'summary', 'match_explanation', 'full_job_description'
+    'summary', 'match_explanation', 'missing_skills', 'resume_improvements', 
+    'resume_summary', 'cover_letter', 'interview_questions', 'recommended_projects', 
+    'full_job_description'
 ]
 # Ensure columns exist before displaying
 display_cols = [c for c in display_cols if c in filtered_df.columns]
