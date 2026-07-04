@@ -111,3 +111,55 @@ class EmailSender:
             print("Email report sent successfully!")
         except Exception as e:
             print(f"Failed to send email: {e}")
+
+    def send_dream_job_alert(self, job: Dict):
+        recipient = "kannaujiyapriyanshu111@gmail.com"
+        
+        msg = MIMEMultipart()
+        msg['From'] = self.email
+        msg['To'] = recipient
+        msg['Subject'] = f"🚨 URGENT: Dream Job Alert! {job.get('title')} @ {job.get('company')}"
+        
+        score = job.get('resume_match_score', 'N/A')
+        html = f"""
+        <html>
+        <head>
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                .alert-box {{ background-color: #ffcccb; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 2px solid red; }}
+                .job-card {{ border: 1px solid #ddd; padding: 15px; border-radius: 5px; }}
+                .job-title {{ font-size: 18px; color: #0056b3; margin-top: 0; }}
+                .company {{ font-weight: bold; }}
+                .score {{ color: #28a745; font-weight: bold; }}
+                .apply-btn {{ display: inline-block; padding: 10px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 3px; margin-top: 10px; }}
+            </style>
+        </head>
+        <body>
+            <div class="alert-box">
+                <h2 style="color: red; margin-top: 0;">🚨 PERFECT MATCH FOUND!</h2>
+                <p>This job meets your criteria: High Match Score, Fresher/0-1 Year Experience, and target location (Mumbai/Pune/Remote).</p>
+            </div>
+            
+            <div class="job-card">
+                <h3 class="job-title">{job.get('title')} @ <span class="company">{job.get('company')}</span></h3>
+                <p><strong>Location:</strong> {job.get('location')} | <strong>Experience:</strong> {job.get('experience_required')}</p>
+                <p><strong>Skills:</strong> {job.get('skills')}</p>
+                <p><strong>Match Score:</strong> <span class="score">{score}/100</span> - {job.get('match_explanation')}</p>
+                <p><strong>Summary:</strong><br>{job.get('summary')}</p>
+                <a href="{job.get('apply_link')}" class="apply-btn">Apply Now</a>
+            </div>
+        </body>
+        </html>
+        """
+        
+        msg.attach(MIMEText(html, 'html'))
+        
+        try:
+            server = smtplib.SMTP(self.smtp_server, self.smtp_port)
+            server.starttls()
+            server.login(self.email, self.password)
+            server.send_message(msg)
+            server.quit()
+            print(f"Dream job alert sent to {recipient}!")
+        except Exception as e:
+            print(f"Failed to send dream job alert: {e}")

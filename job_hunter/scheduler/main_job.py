@@ -15,6 +15,35 @@ from job_hunter.processors.llm_processor import LLMProcessor
 from job_hunter.database.db import db_manager
 from job_hunter.email.sender import EmailSender
 
+def is_dream_job(job: dict) -> bool:
+    score = job.get('resume_match_score', 0)
+    if isinstance(score, str):
+        try:
+            score = int(score)
+        except:
+            score = 0
+            
+    if score < 80:
+        return False
+        
+    location = str(job.get('location', '')).lower()
+    is_target_location = ('mumbai' in location or 
+                          'pune' in location or 
+                          'remote' in location or 
+                          job.get('remote') == True)
+                          
+    if not is_target_location:
+        return False
+        
+    exp = str(job.get('experience_required', '')).lower()
+    title = str(job.get('title', '')).lower()
+    
+    is_fresher = any(word in exp for word in ['0', '1', 'fresher', 'intern', 'entry']) or \
+                 any(word in title for word in ['fresher', 'intern', 'entry', 'junior', 'jr']) or \
+                 job.get('internship') == True
+                 
+    return is_fresher
+
 def run_job_hunter():
     print("Initializing Database...")
     init_db()
@@ -48,6 +77,12 @@ def run_job_hunter():
     print("Processing with LLM...")
     llm = LLMProcessor()
     processed_jobs = llm.process_jobs(cleaned_jobs)
+    
+    email_sender = EmailSender()
+    for job in processed_jobs:
+        if is_dream_job(job):
+            print(f"Dream job found! {job.get('title')} at {job.get('company')}. Sending immediate alert.")
+            email_sender.send_dream_job_alert(job)
     
     print("Saving to database...")
     new_jobs_added = db_manager.save_jobs(processed_jobs)
