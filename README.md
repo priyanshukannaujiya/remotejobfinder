@@ -1,7 +1,7 @@
 <div align="center">
   <h1>🚀 Automated Data Engineering Job Finder & AI Profile Matcher</h1>
   <p><strong>The Ultimate Data Engineering Job Scraper Powered by Python, Playwright, and LLMs (OpenAI / Gemini)</strong></p>
-  <p><h3><a href="https://priyanshukannaujiya.github.io/remotejobfinder/">🌐 Visit the Live Website</a></h3></p>
+  <p><h3><a href="https://priyanshukannaujiya.github.io/remotejobfinder/">🌐 Visit the Live Website</a> | <a href="https://dataenginneringjob-finder-4uexz3lf59hd5dauzymcph.streamlit.app/">📊 View Live Dashboard</a></h3></p>
 </div>
 
 <p align="center">
@@ -22,7 +22,7 @@
 - **Automated Job Scraper:** Headless scraping using **Playwright** and **BeautifulSoup** to extract jobs from modern React/Angular websites without getting blocked.
 - **AI 'Master Profile' Matcher:** No resume upload required! Integrates with **OpenAI API**, **OpenRouter**, or **Google Gemini API** to read the job description, compare it against a *master-crafted AI Data Engineer profile*, and generate a match score (0-100).
 - **SQLite Database:** Avoids duplicate applications by persisting jobs in a local SQLite DB using **SQLAlchemy ORM**.
-- **Streamlit Dashboard:** A beautiful, responsive web UI to filter, search, and export jobs to CSV/JSON.
+- **Live Streamlit Dashboard:** A beautiful, responsive web UI hosted in the cloud to filter, search, and export jobs to CSV/JSON. Check it out here: [Live Dashboard](https://dataenginneringjob-finder-4uexz3lf59hd5dauzymcph.streamlit.app/)
 - **Automated Email Alerts:** Uses **SMTP** to instantly email you when a "Dream Job" (high match score, remote, fresher) is posted.
 - **GitHub Actions Scheduler:** A 100% free CI/CD cron job that runs the scraper daily and pushes updates automatically.
 
