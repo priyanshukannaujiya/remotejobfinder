@@ -80,7 +80,7 @@
             <div class="container hero-content">
                 <div class="hero-text animate-on-scroll fade-up">
                     <h1 class="hero-title">Automate Your Data Engineering Job Hunt with <span class="text-gradient">AI Precision</span></h1>
-                    <p class="hero-subtitle">Stop scrolling through endless job boards. Our powerful Playwright scraper finds the best Data Engineering, ETL, and Big Data roles and matches them to your resume using LLMs.</p>
+                    <p class="hero-subtitle">Stop scrolling through endless job boards. Our powerful Playwright scraper finds the best Data Engineering, ETL, and Big Data roles and evaluates them against an expert-crafted AI Data Engineer profile—no resume upload required!</p>
                     <div class="hero-cta">
                         <a href="https://github.com/priyanshukannaujiya/remotejobfinder" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
                             Get Started
@@ -97,12 +97,12 @@
                         </div>
                         <div class="mockup-body">
                             <div class="code-line"><span class="keyword">import</span> <span class="module">Playwright</span></div>
-                            <div class="code-line"><span class="keyword">from</span> <span class="module">LLM</span> <span class="keyword">import</span> <span class="function">evaluate_resume</span></div>
+                            <div class="code-line"><span class="keyword">from</span> <span class="module">LLM</span> <span class="keyword">import</span> <span class="function">evaluate_master_profile</span></div>
                             <br>
                             <div class="code-line comment"># Fetching jobs...</div>
                             <div class="code-line"><span class="variable">jobs</span> = scraper.get_remote_roles()</div>
-                            <div class="code-line comment"># Matching against resume...</div>
-                            <div class="code-line"><span class="variable">matches</span> = evaluate_resume(jobs, my_resume)</div>
+                            <div class="code-line comment"># Matching against AI Master Profile...</div>
+                            <div class="code-line"><span class="variable">matches</span> = evaluate_master_profile(jobs, ai_de_profile)</div>
                             <br>
                             <div class="code-line success">> Found 15 highly compatible jobs today!</div>
                         </div>
@@ -120,8 +120,8 @@
                 <div class="features-grid">
                     <div class="feature-card glass-card animate-on-scroll zoom-in" style="--delay: 0.1s">
                         <div class="icon-wrapper">🤖</div>
-                        <h3>LLM Resume Matcher</h3>
-                        <p>Integrates with OpenAI, Google Gemini, and OpenRouter to intelligently compare job descriptions with your specific resume, providing a 0-100 match score.</p>
+                        <h3>AI 'Master Profile' Matcher</h3>
+                        <p>No resume upload needed! Integrates with OpenAI and Google Gemini to intelligently compare job descriptions against a pre-built, optimized Data Engineer profile, generating a 0-100 compatibility score.</p>
                     </div>
                     <div class="feature-card glass-card animate-on-scroll zoom-in" style="--delay: 0.2s">
                         <div class="icon-wrapper">🕸️</div>
@@ -167,7 +167,7 @@
                         <div class="timeline-marker">3</div>
                         <div class="timeline-content glass-card">
                             <h3>AI Evaluation</h3>
-                            <p>Google Gemini or GPT-4 assesses the job requirements against your skillset and assigns a compatibility score.</p>
+                            <p>Google Gemini or GPT-4 assesses the job requirements against the built-in Master Data Engineer profile and assigns a compatibility score.</p>
                         </div>
                     </div>
                     <div class="timeline-item animate-on-scroll fade-left">
