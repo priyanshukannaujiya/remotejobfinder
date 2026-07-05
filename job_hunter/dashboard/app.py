@@ -138,6 +138,14 @@ def load_data():
 
 df = load_data()
 
+if not df.empty:
+    if "internship" not in df.columns:
+        df["internship"] = False
+    if "remote" not in df.columns:
+        df["remote"] = False
+    if "resume_match_score" not in df.columns:
+        df["resume_match_score"] = 0
+
 if df.empty:
     st.warning("No data found! Run the scraper first.")
     st.stop()
