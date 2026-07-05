@@ -4,6 +4,7 @@ from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 from typing import List, Dict
 import os
+import json
 from ..config.settings import settings
 from ..database.models import data_dir
 from ..utils.logger import setup_logger
@@ -92,6 +93,19 @@ class EmailSender:
             "bhosaleatharv03@gmail.com",
         ]
 
+        # Add subscribers from json file
+        subscribers_file = os.path.join(data_dir, "subscribers.json")
+        if os.path.exists(subscribers_file):
+            try:
+                with open(subscribers_file, "r") as f:
+                    subscribers = json.load(f)
+                    recipients.extend(subscribers)
+            except Exception as e:
+                logger.error(f"Failed to read subscribers file: {e}")
+
+        # Remove duplicates while preserving order
+        recipients = list(dict.fromkeys(recipients))
+
         msg = MIMEMultipart()
         msg["From"] = self.email
         msg["To"] = ", ".join(recipients)
@@ -109,7 +123,7 @@ class EmailSender:
                 msg.attach(part)
 
         try:
-            server = smtplib.SMTP(self.smtp_server, self.smtp_port)
+            server = smtplib.SMTP(self.smtp_server, self.smtp_port, timeout=10)
             server.starttls()
             server.login(self.email, self.password)
             server.send_message(msg)
@@ -163,7 +177,7 @@ class EmailSender:
         msg.attach(MIMEText(html, "html"))
 
         try:
-            server = smtplib.SMTP(self.smtp_server, self.smtp_port)
+            server = smtplib.SMTP(self.smtp_server, self.smtp_port, timeout=10)
             server.starttls()
             server.login(self.email, self.password)
             server.send_message(msg)
@@ -171,3 +185,43 @@ class EmailSender:
             logger.info(f"Dream job alert sent to {recipient}!")
         except Exception as e:
             logger.error(f"Failed to send dream job alert: {e}")
+
+    def send_welcome_email(self, recipient: str):
+        msg = MIMEMultipart()
+        msg["From"] = self.email
+        msg["To"] = recipient
+        msg["Subject"] = "Welcome to Data Engineering Job Hunter! 🚀"
+
+        html = """
+        <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .welcome-box { background-color: #e9ecef; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+            </style>
+        </head>
+        <body>
+            <div class="welcome-box">
+                <h2>Welcome to Data Engineering Job Hunter! 🚀</h2>
+                <p>Hi there,</p>
+                <p>Thank you for subscribing to our daily job alerts.</p>
+                <p>You will now receive a comprehensive summary of the latest Data Engineering jobs, including remote opportunities and internships, <strong>every day at 7:00 PM IST</strong>.</p>
+                <p>We analyze thousands of jobs and use AI to match them against the ideal criteria, helping you find the perfect fit faster.</p>
+                <br>
+                <p>Best regards,<br>Data Engineering Job Hunter Team</p>
+            </div>
+        </body>
+        </html>
+        """
+        msg.attach(MIMEText(html, "html"))
+
+        try:
+            server = smtplib.SMTP(self.smtp_server, self.smtp_port, timeout=10)
+            server.starttls()
+            server.login(self.email, self.password)
+            server.send_message(msg)
+            server.quit()
+            logger.info(f"Welcome email sent successfully to {recipient}!")
+        except Exception as e:
+            logger.error(f"Failed to send welcome email to {recipient}: {e}")
+
