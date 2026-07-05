@@ -164,16 +164,24 @@ class LLMProcessor:
                 self.current_key_idx = (self.current_key_idx + 1) % len(self.api_keys)
                 genai.configure(api_key=self.api_keys[self.current_key_idx])
 
-            try:
-                import time
-
-                time.sleep(
-                    2
-                )  # Prevent spamming the API and stay well within rate limits
-                result = self._analyze_job(job)
-                job.update(result)
-            except Exception as e:
-                logger.error(f"Error processing job {job.get('job_id')}: {e}")
+            import time
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    time.sleep(
+                        5
+                    )  # Prevent spamming the API and stay well within 15 RPM free tier limits
+                    result = self._analyze_job(job)
+                    job.update(result)
+                    break
+                except Exception as e:
+                    error_str = str(e)
+                    if "429" in error_str and attempt < max_retries - 1:
+                        logger.warning(f"Rate limit exceeded (429) for job {job.get('job_id')}. Retrying in 60s... (Attempt {attempt+1}/{max_retries})")
+                        time.sleep(60)
+                    else:
+                        logger.error(f"Error processing job {job.get('job_id')}: {e}")
+                        break
             enriched_jobs.append(job)
 
         return enriched_jobs
