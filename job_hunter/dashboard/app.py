@@ -197,10 +197,10 @@ if min_score > 0:
     filtered_df = filtered_df[filtered_df["resume_match_score"] >= min_score]
 
 if show_remote_only:
-    filtered_df = filtered_df[filtered_df["remote"]]
+    filtered_df = filtered_df[filtered_df["remote"].astype(bool)]
 
 if show_interns_only:
-    filtered_df = filtered_df[filtered_df["internship"]]
+    filtered_df = filtered_df[filtered_df["internship"].astype(bool)]
 
 if "source" in df.columns:
     sources = sorted(df["source"].dropna().unique().tolist())
