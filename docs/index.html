@@ -100,7 +100,7 @@
                             <div class="code-line"><span class="keyword">from</span> <span class="module">LLM</span> <span class="keyword">import</span> <span class="function">evaluate_master_profile</span></div>
                             <br>
                             <div class="code-line comment"># Fetching jobs...</div>
-                            <div class="code-line"><span class="variable">jobs</span> = scraper.get_remote_roles()</div>
+                            <div class="code-line"><span class="variable">jobs</span> = scraper.fetch(locations=["Remote", "Mumbai", "Pune"])</div>
                             <div class="code-line comment"># Matching against AI Master Profile...</div>
                             <div class="code-line"><span class="variable">matches</span> = evaluate_master_profile(jobs, ai_de_profile)</div>
                             <br>
