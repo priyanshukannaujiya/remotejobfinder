@@ -139,12 +139,24 @@ def load_data():
 df = load_data()
 
 if not df.empty:
+    def parse_bool(x):
+        return str(x).lower() in ["true", "1", "t", "y", "yes"]
+
     if "internship" not in df.columns:
         df["internship"] = False
+    else:
+        df["internship"] = df["internship"].apply(parse_bool)
+        
     if "remote" not in df.columns:
         df["remote"] = False
+    else:
+        df["remote"] = df["remote"].apply(parse_bool)
+        
     if "resume_match_score" not in df.columns:
         df["resume_match_score"] = 0
+    else:
+        # Ensure it's numeric to avoid sorting or filtering errors
+        df["resume_match_score"] = pd.to_numeric(df["resume_match_score"], errors="coerce").fillna(0)
 
 if df.empty:
     st.warning("No data found! Run the scraper first.")
