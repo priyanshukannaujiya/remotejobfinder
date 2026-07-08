@@ -2,6 +2,7 @@ from typing import List, Dict
 from datetime import datetime
 from .base import BaseScraper
 from ..config.settings import settings
+from ..database.db import db_manager
 
 
 class WellfoundScraper(BaseScraper):
@@ -50,7 +51,11 @@ class WellfoundScraper(BaseScraper):
                             )
                             continue
 
-                        for card in job_cards[: settings.max_jobs_per_source]:
+                        new_jobs_for_url = 0
+                        for card in job_cards:
+                            if new_jobs_for_url >= settings.max_jobs_per_source:
+                                break
+                                
                             # Extract raw text and try to heuristically split it, or find standard tags
                             text_content = card.inner_text().strip()
                             if not text_content or "Data" not in text_content:
@@ -76,12 +81,16 @@ class WellfoundScraper(BaseScraper):
                                 if href and href.startswith("/")
                                 else href
                             )
+                            
+                            job_id = self.generate_job_id("wf", company_text, title_text)
+                            if db_manager.job_exists(job_id):
+                                continue
+                                
+                            new_jobs_for_url += 1
 
                             jobs.append(
                                 {
-                                    "job_id": self.generate_job_id(
-                                        "wf", company_text, title_text
-                                    ),
+                                    "job_id": job_id,
                                     "company": self.clean_title(company_text),
                                     "title": self.clean_title(title_text),
                                     "location": location_text,

@@ -2,6 +2,7 @@ from typing import List, Dict
 from datetime import datetime
 from .base import BaseScraper
 from ..config.settings import settings
+from ..database.db import db_manager
 
 
 class IndeedScraper(BaseScraper):
@@ -45,7 +46,11 @@ class IndeedScraper(BaseScraper):
 
                         job_cards = page.query_selector_all(".job_seen_beacon")
 
-                        for card in job_cards[: settings.max_jobs_per_source]:
+                        new_jobs_for_url = 0
+                        for card in job_cards:
+                            if new_jobs_for_url >= settings.max_jobs_per_source:
+                                break
+                            
                             title_elem = card.query_selector("h2.jobTitle span[title]")
                             company_elem = card.query_selector("[data-testid='company-name']")
                             location_elem = card.query_selector("[data-testid='text-location']")
@@ -61,6 +66,13 @@ class IndeedScraper(BaseScraper):
                             location_text = (
                                 location_elem.inner_text() if location_elem else "Remote"
                             )
+                            
+                            job_id = self.generate_job_id("ind", company_text, title_text)
+                            if db_manager.job_exists(job_id):
+                                continue
+                                
+                            new_jobs_for_url += 1
+                            
                             href = link_elem.get_attribute("href")
 
                             full_link = (
@@ -84,9 +96,7 @@ class IndeedScraper(BaseScraper):
 
                             jobs.append(
                                 {
-                                    "job_id": self.generate_job_id(
-                                        "ind", company_text, title_text
-                                    ),
+                                    "job_id": job_id,
                                     "company": self.clean_title(company_text),
                                     "title": self.clean_title(title_text),
                                     "location": location_text,

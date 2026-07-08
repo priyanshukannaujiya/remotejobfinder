@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     app_password: str = Field(..., env="APP_PASSWORD")
     gemini_api_keys: str = Field(default="", env="GEMINI_API_KEYS")
     openrouter_api_key: str = Field(default="", env="OPENROUTER_API_KEY")
+    groq_api_key: str = Field(default="", env="GROQ_API_KEY")
 
     @property
     def get_gemini_api_keys_list(self) -> list[str]:
@@ -24,7 +25,7 @@ class Settings(BaseSettings):
 
     timezone: str = Field(default="Asia/Kolkata", env="TIMEZONE")
     schedule_time: str = Field(default="19:00", env="SCHEDULE_TIME")
-    max_jobs_per_source: int = Field(default=10, env="MAX_JOBS_PER_SOURCE")
+    max_jobs_per_source: int = Field(default=30, env="MAX_JOBS_PER_SOURCE")
 
     model_config = SettingsConfigDict(
         env_file=os.path.join(

@@ -2,6 +2,7 @@ from typing import List, Dict
 from datetime import datetime
 from .base import BaseScraper
 from ..config.settings import settings
+from ..database.db import db_manager
 
 
 class YCPlaywrightScraper(BaseScraper):
@@ -28,7 +29,11 @@ class YCPlaywrightScraper(BaseScraper):
                 # HackerNews jobs is very simple HTML
                 rows = page.query_selector_all("tr.athing")
 
-                for row in rows[: settings.max_jobs_per_source]:
+                new_jobs_for_url = 0
+                for row in rows:
+                    if new_jobs_for_url >= settings.max_jobs_per_source:
+                        break
+                        
                     title_elem = row.query_selector(".titleline a")
                     if not title_elem:
                         continue
@@ -53,25 +58,29 @@ class YCPlaywrightScraper(BaseScraper):
                     except Exception:
                         pass  # Ignore parsing errors on age and continue safely
 
-                    # Fetch full job description by visiting the link
-                    full_desc_text = title_text
-                    try:
-                        job_page = browser.new_page()
-                        job_page.goto(link, timeout=15000)
-                        # Extract all visible text from the page
-                        full_desc_text = job_page.evaluate("document.body.innerText")
-                        job_page.close()
-                    except Exception as e:
-                        print(f"Failed to fetch YC job description for {link}: {e}")
-
                     # Basic heuristic for Data Engineering
                     lower_title = title_text.lower()
                     if "data" in lower_title or "engineer" in lower_title:
+                        job_id = self.generate_job_id("yc", "YC Startup", title_text)
+                        if db_manager.job_exists(job_id):
+                            continue
+                            
+                        new_jobs_for_url += 1
+                        
+                        # Fetch full job description by visiting the link
+                        full_desc_text = title_text
+                        try:
+                            job_page = browser.new_page()
+                            job_page.goto(link, timeout=15000)
+                            # Extract all visible text from the page
+                            full_desc_text = job_page.evaluate("document.body.innerText")
+                            job_page.close()
+                        except Exception as e:
+                            print(f"Failed to fetch YC job description for {link}: {e}")
+
                         jobs.append(
                             {
-                                "job_id": self.generate_job_id(
-                                    "yc", "YC Startup", title_text
-                                ),
+                                "job_id": job_id,
                                 "company": "YC Startup",  # HN jobs often have company in title
                                 "title": self.clean_title(title_text),
                                 "location": "Remote/US",  # Need LLM to extract this from text

@@ -5,6 +5,7 @@ from datetime import datetime
 import time
 from .base import BaseScraper
 from ..config.settings import settings
+from ..database.db import db_manager
 
 
 class LinkedInScraper(BaseScraper):
@@ -52,8 +53,9 @@ class LinkedInScraper(BaseScraper):
                 soup = BeautifulSoup(response.text, "html.parser")
                 job_cards = soup.find_all("div", class_="base-card")
 
+                new_jobs_for_url = 0
                 for card in job_cards:
-                    if len(jobs) >= settings.max_jobs_per_source:
+                    if new_jobs_for_url >= settings.max_jobs_per_source:
                         break
 
                     title_elem = card.find("h3", class_="base-search-card__title")
@@ -75,6 +77,13 @@ class LinkedInScraper(BaseScraper):
                         if location_elem
                         else "Unknown Location"
                     )
+                    
+                    job_id = self.generate_job_id("li", company_text, title_text)
+                    if db_manager.job_exists(job_id):
+                        continue
+                        
+                    new_jobs_for_url += 1
+
                     apply_link = link_elem.get("href", "").split("?")[
                         0
                     ]  # keep base link without tracking
@@ -100,9 +109,7 @@ class LinkedInScraper(BaseScraper):
 
                     jobs.append(
                         {
-                            "job_id": self.generate_job_id(
-                                "li", company_text, title_text
-                            ),
+                            "job_id": job_id,
                             "company": self.clean_title(company_text),
                             "title": self.clean_title(title_text),
                             "location": location_text,

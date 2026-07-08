@@ -109,5 +109,13 @@ class DatabaseManager:
         finally:
             db.close()
 
+    def job_exists(self, job_id: str) -> bool:
+        """Check if a single job_id already exists in the database."""
+        db = SessionLocal()
+        try:
+            return db.query(Job.job_id).filter(Job.job_id == job_id).first() is not None
+        finally:
+            db.close()
+
 
 db_manager = DatabaseManager()

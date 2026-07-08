@@ -15,11 +15,20 @@ class LLMProcessor:
         self.gemini_model = None
         self.openai_client = None
 
-        if settings.openrouter_api_key:
+        self.model_name = None
+        
+        if settings.groq_api_key:
+            self.openai_client = OpenAI(
+                base_url="https://api.groq.com/openai/v1",
+                api_key=settings.groq_api_key,
+            )
+            self.model_name = "llama3-70b-8192"
+        elif settings.openrouter_api_key:
             self.openai_client = OpenAI(
                 base_url="https://openrouter.ai/api/v1",
                 api_key=settings.openrouter_api_key,
             )
+            self.model_name = "google/gemini-2.5-flash"
         elif self.api_keys:
             genai.configure(api_key=self.api_keys[0])
             self.gemini_model = genai.GenerativeModel("gemini-2.5-flash")
@@ -160,25 +169,27 @@ class LLMProcessor:
 
         enriched_jobs = []
         for job in jobs:
-            if not self.openai_client and self.api_keys:
-                self.current_key_idx = (self.current_key_idx + 1) % len(self.api_keys)
-                genai.configure(api_key=self.api_keys[self.current_key_idx])
-
             import time
-            max_retries = 3
+            
+            max_retries = (len(self.api_keys) * 2) if self.api_keys else 3
             for attempt in range(max_retries):
                 try:
-                    time.sleep(
-                        5
-                    )  # Prevent spamming the API and stay well within 15 RPM free tier limits
+                    time.sleep(5)  # Prevent spamming the API and stay well within limits
                     result = self._analyze_job(job)
                     job.update(result)
                     break
                 except Exception as e:
                     error_str = str(e)
-                    if "429" in error_str and attempt < max_retries - 1:
-                        logger.warning(f"Rate limit exceeded (429) for job {job.get('job_id')}. Retrying in 60s... (Attempt {attempt+1}/{max_retries})")
-                        time.sleep(60)
+                    if "429" in error_str:
+                        if not self.openai_client and self.api_keys:
+                            self.current_key_idx = (self.current_key_idx + 1) % len(self.api_keys)
+                            genai.configure(api_key=self.api_keys[self.current_key_idx])
+                            logger.warning(f"Rate limit (429) hit. Switched to API key {self.current_key_idx + 1}/{len(self.api_keys)}")
+                        
+                        # Only sleep if we've cycled through all keys
+                        if attempt > 0 and attempt % len(self.api_keys) == 0:
+                            logger.warning(f"All keys rate limited for job {job.get('job_id')}. Sleeping 60s... (Attempt {attempt+1}/{max_retries})")
+                            time.sleep(60)
                     else:
                         logger.error(f"Error processing job {job.get('job_id')}: {e}")
                         break
@@ -209,7 +220,7 @@ class LLMProcessor:
 
         if self.openai_client:
             response = self.openai_client.chat.completions.create(
-                model="google/gemini-2.5-flash",
+                model=self.model_name,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},
