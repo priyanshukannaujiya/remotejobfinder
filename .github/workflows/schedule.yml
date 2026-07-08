@@ -44,3 +44,31 @@ jobs:
           git add data/
           git commit -m "Automated data update: $(date)" || exit 0
           git push
+
+      - name: Send Pipeline Failure Alert
+        if: failure()
+        env:
+          EMAIL: ${{ secrets.EMAIL }}
+          APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
+        run: |
+          python3 -c "
+          import smtplib
+          from email.mime.text import MIMEText
+          import os
+          
+          try:
+              msg = MIMEText('The RemoteJobFinder GitHub Action pipeline has encountered a critical failure. Please check the logs in your GitHub Actions tab to see what went wrong.')
+              msg['Subject'] = '🚨 URGENT: Job Scraper Pipeline Failed!'
+              msg['From'] = os.environ.get('EMAIL', '')
+              msg['To'] = 'heypk4@gmail.com, kannaujiyapriyanshu111@gmail.com'
+              
+              if msg['From']:
+                  s = smtplib.SMTP('smtp.gmail.com', 587)
+                  s.starttls()
+                  s.login(os.environ['EMAIL'], os.environ['APP_PASSWORD'])
+                  s.send_message(msg)
+                  s.quit()
+                  print('Failure email sent successfully.')
+          except Exception as e:
+              print(f'Could not send failure email: {e}')
+          "

@@ -143,4 +143,16 @@ def run_job_hunter():
 
 
 if __name__ == "__main__":
-    run_job_hunter()
+    try:
+        run_job_hunter()
+    except Exception as e:
+        logger.error(f"Critical error in main_job: {e}")
+        try:
+            import traceback
+            from job_hunter.email.sender import EmailSender
+            error_details = traceback.format_exc()
+            email_sender = EmailSender()
+            email_sender.send_failure_alert(error_details)
+        except Exception as inner_e:
+            logger.error(f"Failed to send failure email: {inner_e}")
+        raise e

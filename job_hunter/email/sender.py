@@ -243,3 +243,41 @@ class EmailSender:
         except Exception as e:
             logger.error(f"Failed to send welcome email to {recipient}: {e}")
 
+    def send_failure_alert(self, error_details: str):
+        msg = MIMEMultipart()
+        msg["From"] = self.email
+        msg["To"] = f"{self.email}, kannaujiyapriyanshu111@gmail.com"
+        msg["Subject"] = "🚨 SYSTEM FAILURE: Job Scraper Pipeline Crashed"
+
+        html = f"""
+        <html>
+        <head>
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                .alert-box {{ background-color: #ffcccb; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 2px solid red; }}
+            </style>
+        </head>
+        <body>
+            <div class="alert-box">
+                <h2 style="color: red; margin-top: 0;">🚨 CRITICAL ERROR!</h2>
+                <p>The job scraper script encountered a fatal error and stopped running.</p>
+                <h3>Error Details:</h3>
+                <pre style="background: #f4f4f4; padding: 10px; border: 1px solid #ddd; overflow-x: auto;">{error_details}</pre>
+                <p>Please check the GitHub Actions logs for more information.</p>
+            </div>
+        </body>
+        </html>
+        """
+        msg.attach(MIMEText(html, "html"))
+        
+        try:
+            server = smtplib.SMTP(self.smtp_server, self.smtp_port, timeout=10)
+            server.starttls()
+            server.login(self.email, self.password)
+            server.send_message(msg)
+            server.quit()
+            logger.info("Failure email sent successfully!")
+        except Exception as e:
+            logger.error(f"Failed to send failure email: {e}")
+
+
