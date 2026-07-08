@@ -415,6 +415,12 @@ footer {
     color: var(--text-secondary);
 }
 
+.social-links {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
 .social-links a {
     color: var(--text-secondary);
     transition: color 0.3s ease;
