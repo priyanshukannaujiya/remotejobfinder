@@ -205,6 +205,8 @@ class LLMProcessor:
             "2. Location preference: Remote (Worldwide) OR physically in India. Prioritize Remote Internship, Data Engineering Internship, or Fresher roles.\n"
             "3. The job should match common Data Engineering keywords (e.g. Data Engineer, ETL Developer, Big Data, Snowflake, Spark, Python SQL).\n"
             "Return a JSON object with exactly these fields:\n"
+            "- experience_required: A short string indicating the years of experience required (e.g. '0-1 years', 'Fresher', '3+ years').\n"
+            "- skills: A comma-separated string of required technical skills.\n"
             "- summary: A list of 3 string bullet points summarizing the job requirements.\n"
             "- resume_match_score: An integer from 0 to 100 representing how well the candidate fits (0 if senior/requires >2 yrs).\n"
             "- match_explanation: A short string explaining the score and comparing skills.\n"
@@ -263,6 +265,8 @@ class LLMProcessor:
                 "cover_letter": "",
                 "interview_questions": [],
                 "recommended_projects": [],
+                "experience_required": "Unknown",
+                "skills": "Unknown",
             }
 
         for field in [

@@ -1,6 +1,7 @@
 import sys
 import os
 import datetime
+import re
 
 # Add parent dir to path so we can run directly
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -44,9 +45,11 @@ def is_dream_job(job: dict) -> bool:
 
     exp = str(job.get("experience_required", "")).lower()
     title = str(job.get("title", "")).lower()
+    desc = str(job.get("summary", "")).lower()
 
     is_fresher = (
-        any(word in exp for word in ["0", "1", "fresher", "intern", "entry"])
+        bool(re.search(r'\b(0|1)\b', exp))
+        or any(word in exp for word in ["fresher", "intern", "entry"])
         or any(word in title for word in ["fresher", "intern", "entry", "junior", "jr"])
         or job.get("internship") is True
     )
