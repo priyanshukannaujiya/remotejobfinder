@@ -143,10 +143,12 @@ class EmailSender:
                 msg.attach(part)
 
         import time
+        import ssl
         max_retries = 3
         for attempt in range(max_retries):
             try:
-                server = smtplib.SMTP_SSL(self.smtp_server, self.smtp_port, timeout=15)
+                context = ssl.create_default_context()
+                server = smtplib.SMTP_SSL(self.smtp_server, self.smtp_port, context=context, timeout=15)
                 server.login(self.email, self.password)
                 server.send_message(msg)
                 server.quit()
