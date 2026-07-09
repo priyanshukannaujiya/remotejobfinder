@@ -19,7 +19,7 @@ class EmailSender:
         self.smtp_server = "smtp.gmail.com"
         self.smtp_port = 587
 
-    def generate_html_report(self, jobs: List[Dict]) -> str:
+    def generate_html_report(self, jobs: List[Dict], news: List[Dict] = None) -> str:
         if not jobs:
             return "<h2>No new jobs found today.</h2>"
 
@@ -56,7 +56,27 @@ class EmailSender:
                     <li>Internships: {internships}</li>
                 </ul>
             </div>
-            
+        """
+
+        if news:
+            html += """
+            <div class="summary-box">
+                <h3>🔥 Latest Data Engineering Trends</h3>
+                <ul style="list-style-type: none; padding-left: 0;">
+            """
+            for item in news:
+                html += f"""
+                    <li style="margin-bottom: 10px;">
+                        <a href="{item.get('url')}" style="font-size: 16px; font-weight: bold; color: #0056b3; text-decoration: none;">{item.get('title')}</a>
+                        <p style="margin: 5px 0 0 0; color: #555;">{item.get('description')}</p>
+                    </li>
+                """
+            html += """
+                </ul>
+            </div>
+            """
+
+        html += """
             <h3>Top 10 Matches</h3>
         """
 
@@ -79,7 +99,7 @@ class EmailSender:
         """
         return html
 
-    def send_report(self, jobs: List[Dict]):
+    def send_report(self, jobs: List[Dict], news: List[Dict] = None):
         if not jobs:
             logger.info("No jobs to email.")
             return
@@ -111,7 +131,7 @@ class EmailSender:
         msg["To"] = ", ".join(recipients)
         msg["Subject"] = f"Daily Data Engineering Jobs Report - {len(jobs)} New Jobs"
 
-        html_content = self.generate_html_report(jobs)
+        html_content = self.generate_html_report(jobs, news=news)
         msg.attach(MIMEText(html_content, "html"))
 
         # Attach CSV

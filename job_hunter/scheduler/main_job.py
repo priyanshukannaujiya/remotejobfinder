@@ -16,6 +16,7 @@ from job_hunter.processors.data_cleaner import DataCleaner
 from job_hunter.processors.llm_processor import LLMProcessor
 from job_hunter.database.db import db_manager
 from job_hunter.email.sender import EmailSender
+from job_hunter.utils.news_fetcher import NewsFetcher
 from job_hunter.utils.logger import setup_logger
 
 logger = setup_logger(__name__)
@@ -128,8 +129,11 @@ def run_job_hunter():
             logger.info("It's past 6:30 PM IST and no report sent today. Sending daily batch report to all recipients...")
             todays_jobs = db_manager.get_todays_jobs()
             if todays_jobs:
+                logger.info("Fetching latest Data Engineering news...")
+                news = NewsFetcher.get_latest_news(limit=3)
+                
                 email_sender = EmailSender()
-                email_sender.send_report(todays_jobs)
+                email_sender.send_report(todays_jobs, news=news)
                 # Mark as sent
                 with open(last_report_file, "w") as f:
                     f.write(current_date)
