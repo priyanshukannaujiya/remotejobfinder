@@ -2,7 +2,7 @@ name: Daily Job Scraper
 
 on:
   schedule:
-    # Run every hour at the 30-minute mark (so the 13:30 UTC run is exactly 7 PM IST)
+    # Run every hour at the 30-minute mark (so the 04:30 UTC run is exactly 10:00 AM IST)
     - cron: '30 * * * *'
   workflow_dispatch:
 

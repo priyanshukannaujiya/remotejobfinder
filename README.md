@@ -130,7 +130,7 @@ Don't want to pay for a server? Let GitHub run the script for you every day!
 1. Go to your GitHub repository -> **Settings** -> **Secrets and Variables** -> **Actions**.
 2. Click **New repository secret** and add your `.env` variables exactly as they are named (`EMAIL`, `APP_PASSWORD`, `GEMINI_API_KEYS`, `OPENROUTER_API_KEY`).
 3. The `.github/workflows/schedule.yml` file is already configured. 
-4. **How it works**: Every day at 7:00 PM IST, GitHub spins up an Ubuntu server, installs Python/Playwright, scrapes the jobs, scores them, emails you the report, and commits the updated database (`jobs.db`) back to your GitHub repository!
+4. **How it works**: Every day at 10:00 AM IST, GitHub spins up an Ubuntu server, installs Python/Playwright, scrapes the jobs, scores them, emails you the report, and commits the updated database (`jobs.db`) back to your GitHub repository!
 
 ---
 

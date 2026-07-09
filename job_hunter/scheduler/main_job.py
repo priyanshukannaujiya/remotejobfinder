@@ -125,8 +125,8 @@ def run_job_hunter():
                 
         current_date = now_utc.strftime("%Y-%m-%d")
 
-        if now_utc.hour >= 13 and last_report_date != current_date:
-            logger.info("It's past 6:30 PM IST and no report sent today. Sending daily batch report to all recipients...")
+        if now_utc.hour >= 4 and last_report_date != current_date:
+            logger.info("It's past 10:00 AM IST and no report sent today. Sending daily batch report to all recipients...")
             todays_jobs = db_manager.get_todays_jobs()
             if todays_jobs:
                 logger.info("Fetching latest Data Engineering news...")
@@ -143,7 +143,7 @@ def run_job_hunter():
             if last_report_date == current_date:
                 logger.info("Daily report already sent for today.")
             else:
-                logger.info(f"Skipping daily report for now. It will be sent after 6:30 PM IST. (Current UTC hour: {now_utc.hour})")
+                logger.info(f"Skipping daily report for now. It will be sent after 10:00 AM IST. (Current UTC hour: {now_utc.hour})")
 
 
 if __name__ == "__main__":

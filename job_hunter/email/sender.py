@@ -17,7 +17,7 @@ class EmailSender:
         self.email = settings.email
         self.password = settings.app_password
         self.smtp_server = "smtp.gmail.com"
-        self.smtp_port = 587
+        self.smtp_port = 465
 
     def generate_html_report(self, jobs: List[Dict], news: List[Dict] = None) -> str:
         if not jobs:
@@ -146,8 +146,7 @@ class EmailSender:
         max_retries = 3
         for attempt in range(max_retries):
             try:
-                server = smtplib.SMTP(self.smtp_server, self.smtp_port, timeout=15)
-                server.starttls()
+                server = smtplib.SMTP_SSL(self.smtp_server, self.smtp_port, timeout=15)
                 server.login(self.email, self.password)
                 server.send_message(msg)
                 server.quit()
@@ -209,8 +208,7 @@ class EmailSender:
         max_retries = 3
         for attempt in range(max_retries):
             try:
-                server = smtplib.SMTP(self.smtp_server, self.smtp_port, timeout=15)
-                server.starttls()
+                server = smtplib.SMTP_SSL(self.smtp_server, self.smtp_port, timeout=15)
                 server.login(self.email, self.password)
                 server.send_message(msg)
                 server.quit()
@@ -243,7 +241,7 @@ class EmailSender:
                 <h2>Welcome to Data Engineering Job Hunter! 🚀</h2>
                 <p>Hi there,</p>
                 <p>Thank you for subscribing to our daily job alerts.</p>
-                <p>You will now receive a comprehensive summary of the latest Data Engineering jobs, including remote opportunities and internships, <strong>every day at 7:00 PM IST</strong>.</p>
+                <p>You will now receive a comprehensive summary of the latest Data Engineering jobs, including remote opportunities and internships, <strong>every day at 10:00 AM IST</strong>.</p>
                 <p>We analyze thousands of jobs and use AI to match them against the ideal criteria, helping you find the perfect fit faster.</p>
                 <br>
                 <p>Best regards,<br>Data Engineering Job Hunter Team</p>
@@ -254,8 +252,7 @@ class EmailSender:
         msg.attach(MIMEText(html, "html"))
 
         try:
-            server = smtplib.SMTP(self.smtp_server, self.smtp_port, timeout=10)
-            server.starttls()
+            server = smtplib.SMTP_SSL(self.smtp_server, self.smtp_port, timeout=10)
             server.login(self.email, self.password)
             server.send_message(msg)
             server.quit()
@@ -291,8 +288,7 @@ class EmailSender:
         msg.attach(MIMEText(html, "html"))
         
         try:
-            server = smtplib.SMTP(self.smtp_server, self.smtp_port, timeout=10)
-            server.starttls()
+            server = smtplib.SMTP_SSL(self.smtp_server, self.smtp_port, timeout=10)
             server.login(self.email, self.password)
             server.send_message(msg)
             server.quit()
