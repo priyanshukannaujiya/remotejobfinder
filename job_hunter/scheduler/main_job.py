@@ -12,6 +12,7 @@ from job_hunter.scrapers.linkedin_scraper import LinkedInScraper
 from job_hunter.scrapers.indeed_scraper import IndeedScraper
 from job_hunter.scrapers.wellfound_scraper import WellfoundScraper
 from job_hunter.scrapers.glassdoor_scraper import GlassdoorScraper
+from job_hunter.scrapers.google_scraper import GoogleJobsScraper
 from job_hunter.processors.data_cleaner import DataCleaner
 from job_hunter.processors.llm_processor import LLMProcessor
 from job_hunter.database.db import db_manager
@@ -69,6 +70,7 @@ def run_job_hunter():
         IndeedScraper(),
         WellfoundScraper(),
         GlassdoorScraper(),
+        GoogleJobsScraper(),
     ]
 
     try:
@@ -114,36 +116,51 @@ def run_job_hunter():
     finally:
         logger.info("Checking if it's time to send the daily report...")
         now_utc = datetime.datetime.utcnow()
-        # We want to send the report around 7 PM IST (13:30 UTC).
-        # We will send it if the current UTC hour is >= 13, AND we haven't sent it today.
-        
-        last_report_file = os.path.join(data_dir, "last_report_date.txt")
-        last_report_date = ""
-        if os.path.exists(last_report_file):
-            with open(last_report_file, "r") as f:
-                last_report_date = f.read().strip()
+        # Check and send News at 10:00 AM IST (now_utc.hour == 4)
+        last_news_file = os.path.join(data_dir, "last_news_date.txt")
+        last_news_date = ""
+        if os.path.exists(last_news_file):
+            with open(last_news_file, "r") as f:
+                last_news_date = f.read().strip()
                 
+        # Check and send Jobs at 7:00 PM IST (now_utc.hour == 13)
+        last_jobs_file = os.path.join(data_dir, "last_jobs_date.txt")
+        last_jobs_date = ""
+        if os.path.exists(last_jobs_file):
+            with open(last_jobs_file, "r") as f:
+                last_jobs_date = f.read().strip()
+
         current_date = now_utc.strftime("%Y-%m-%d")
 
-        if now_utc.hour >= 4 and last_report_date != current_date:
-            logger.info("It's past 10:00 AM IST and no report sent today. Sending daily batch report to all recipients...")
+        email_sender = EmailSender()
+
+        # News logic (10:00 AM IST / hour >= 4)
+        if now_utc.hour >= 4 and last_news_date != current_date:
+            logger.info("It's past 10:00 AM IST. Fetching and sending Data Engineering news...")
+            news = NewsFetcher.get_latest_news(limit=3)
+            if news:
+                email_sender.send_news_newsletter(news)
+            with open(last_news_file, "w") as f:
+                f.write(current_date)
+        elif last_news_date != current_date:
+            logger.info(f"Skipping news report for now. It will be sent after 10:00 AM IST. (Current UTC hour: {now_utc.hour})")
+        else:
+            logger.info("News report already sent for today.")
+                
+        # Jobs logic (7:00 PM IST / hour >= 13)
+        if now_utc.hour >= 13 and last_jobs_date != current_date:
+            logger.info("It's past 7:00 PM IST. Sending daily jobs batch report...")
             todays_jobs = db_manager.get_todays_jobs()
             if todays_jobs:
-                logger.info("Fetching latest Data Engineering news...")
-                news = NewsFetcher.get_latest_news(limit=3)
-                
-                email_sender = EmailSender()
-                email_sender.send_report(todays_jobs, news=news)
-                # Mark as sent
-                with open(last_report_file, "w") as f:
-                    f.write(current_date)
+                email_sender.send_report(todays_jobs)
             else:
                 logger.info("No jobs found today to send in the daily report.")
+            with open(last_jobs_file, "w") as f:
+                f.write(current_date)
+        elif last_jobs_date != current_date:
+            logger.info(f"Skipping jobs report for now. It will be sent after 7:00 PM IST. (Current UTC hour: {now_utc.hour})")
         else:
-            if last_report_date == current_date:
-                logger.info("Daily report already sent for today.")
-            else:
-                logger.info(f"Skipping daily report for now. It will be sent after 10:00 AM IST. (Current UTC hour: {now_utc.hour})")
+            logger.info("Jobs report already sent for today.")
 
 
 if __name__ == "__main__":

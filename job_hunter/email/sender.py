@@ -17,9 +17,9 @@ class EmailSender:
         self.email = settings.email
         self.password = settings.app_password
         self.smtp_server = "smtp.gmail.com"
-        self.smtp_port = 465
+        self.smtp_port = 587
 
-    def generate_html_report(self, jobs: List[Dict], news: List[Dict] = None) -> str:
+    def generate_html_report(self, jobs: List[Dict]) -> str:
         if not jobs:
             return "<h2>No new jobs found today.</h2>"
 
@@ -58,24 +58,6 @@ class EmailSender:
             </div>
         """
 
-        if news:
-            html += """
-            <div class="summary-box">
-                <h3>🔥 Latest Data Engineering Trends</h3>
-                <ul style="list-style-type: none; padding-left: 0;">
-            """
-            for item in news:
-                html += f"""
-                    <li style="margin-bottom: 10px;">
-                        <a href="{item.get('url')}" style="font-size: 16px; font-weight: bold; color: #0056b3; text-decoration: none;">{item.get('title')}</a>
-                        <p style="margin: 5px 0 0 0; color: #555;">{item.get('description')}</p>
-                    </li>
-                """
-            html += """
-                </ul>
-            </div>
-            """
-
         html += """
             <h3>Top 10 Matches</h3>
         """
@@ -99,7 +81,7 @@ class EmailSender:
         """
         return html
 
-    def send_report(self, jobs: List[Dict], news: List[Dict] = None):
+    def send_report(self, jobs: List[Dict]):
         if not jobs:
             logger.info("No jobs to email.")
             return
@@ -131,7 +113,7 @@ class EmailSender:
         msg["To"] = ", ".join(recipients)
         msg["Subject"] = f"Daily Data Engineering Jobs Report - {len(jobs)} New Jobs"
 
-        html_content = self.generate_html_report(jobs, news=news)
+        html_content = self.generate_html_report(jobs)
         msg.attach(MIMEText(html_content, "html"))
 
         # Attach CSV
@@ -148,7 +130,8 @@ class EmailSender:
         for attempt in range(max_retries):
             try:
                 context = ssl.create_default_context()
-                server = smtplib.SMTP_SSL(self.smtp_server, self.smtp_port, context=context, timeout=15)
+                server = smtplib.SMTP(self.smtp_server, self.smtp_port, timeout=60)
+                server.starttls(context=context)
                 server.login(self.email, self.password)
                 server.send_message(msg)
                 server.quit()
@@ -161,6 +144,93 @@ class EmailSender:
                     time.sleep(5)
                 else:
                     logger.error("Max retries reached. Email sending failed permanently.")
+                    raise Exception("Failed to send email report after 3 attempts.") from e
+
+    def generate_news_html(self, news: List[Dict]) -> str:
+        if not news:
+            return "<h2>No news found today.</h2>"
+
+        html = """
+        <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .summary-box { background-color: #f4f4f4; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+            </style>
+        </head>
+        <body>
+            <div class="summary-box">
+                <h3>🔥 Latest Data Engineering Trends</h3>
+                <ul style="list-style-type: none; padding-left: 0;">
+        """
+        for item in news:
+            html += f"""
+                    <li style="margin-bottom: 10px;">
+                        <a href="{item.get('url')}" style="font-size: 16px; font-weight: bold; color: #0056b3; text-decoration: none;">{item.get('title')}</a>
+                        <p style="margin: 5px 0 0 0; color: #555;">{item.get('description')}</p>
+                    </li>
+            """
+        html += """
+                </ul>
+            </div>
+        </body>
+        </html>
+        """
+        return html
+
+    def send_news_newsletter(self, news: List[Dict]):
+        if not news:
+            logger.info("No news to email.")
+            return
+
+        recipients = [
+            self.email,
+            "atharvbhosale03@gmail.com",
+            "kannaujiyapriyanshu111@gmail.com",
+            "aaditya.2007singh@gmail.com",
+            "bhosaleatharv16@gmail.com",
+            "bhosaleatharv03@gmail.com",
+        ]
+
+        subscribers_file = os.path.join(data_dir, "subscribers.json")
+        if os.path.exists(subscribers_file):
+            try:
+                with open(subscribers_file, "r") as f:
+                    subscribers = json.load(f)
+                    recipients.extend(subscribers)
+            except Exception as e:
+                logger.error(f"Failed to read subscribers file: {e}")
+
+        recipients = list(dict.fromkeys(recipients))
+
+        msg = MIMEMultipart()
+        msg["From"] = self.email
+        msg["To"] = ", ".join(recipients)
+        msg["Subject"] = "Daily Data Engineering News & Trends 🔥"
+
+        html_content = self.generate_news_html(news)
+        msg.attach(MIMEText(html_content, "html"))
+
+        import time
+        import ssl
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                context = ssl.create_default_context()
+                server = smtplib.SMTP(self.smtp_server, self.smtp_port, timeout=60)
+                server.starttls(context=context)
+                server.login(self.email, self.password)
+                server.send_message(msg)
+                server.quit()
+                logger.info("News newsletter sent successfully!")
+                break
+            except Exception as e:
+                logger.error(f"Failed to send news email (attempt {attempt+1}/{max_retries}): {e}")
+                if attempt < max_retries - 1:
+                    logger.info("Retrying in 5 seconds...")
+                    time.sleep(5)
+                else:
+                    logger.error("Max retries reached. News email sending failed permanently.")
 
     def send_dream_job_alert(self, job: Dict):
         recipient = "kannaujiyapriyanshu111@gmail.com"
@@ -210,7 +280,8 @@ class EmailSender:
         max_retries = 3
         for attempt in range(max_retries):
             try:
-                server = smtplib.SMTP_SSL(self.smtp_server, self.smtp_port, timeout=15)
+                server = smtplib.SMTP(self.smtp_server, self.smtp_port, timeout=60)
+                server.starttls()
                 server.login(self.email, self.password)
                 server.send_message(msg)
                 server.quit()
@@ -223,6 +294,7 @@ class EmailSender:
                     time.sleep(5)
                 else:
                     logger.error("Max retries reached. Dream job alert failed permanently.")
+                    raise Exception("Failed to send dream job alert after 3 attempts.") from e
 
     def send_welcome_email(self, recipient: str):
         msg = MIMEMultipart()
@@ -254,7 +326,8 @@ class EmailSender:
         msg.attach(MIMEText(html, "html"))
 
         try:
-            server = smtplib.SMTP_SSL(self.smtp_server, self.smtp_port, timeout=10)
+            server = smtplib.SMTP(self.smtp_server, self.smtp_port, timeout=10)
+            server.starttls()
             server.login(self.email, self.password)
             server.send_message(msg)
             server.quit()
@@ -290,7 +363,8 @@ class EmailSender:
         msg.attach(MIMEText(html, "html"))
         
         try:
-            server = smtplib.SMTP_SSL(self.smtp_server, self.smtp_port, timeout=10)
+            server = smtplib.SMTP(self.smtp_server, self.smtp_port, timeout=10)
+            server.starttls()
             server.login(self.email, self.password)
             server.send_message(msg)
             server.quit()

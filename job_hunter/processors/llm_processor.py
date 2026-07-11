@@ -22,7 +22,7 @@ class LLMProcessor:
                 base_url="https://api.groq.com/openai/v1",
                 api_key=settings.groq_api_key,
             )
-            self.model_name = "llama3-70b-8192"
+            self.model_name = "llama-3.3-70b-versatile"
         elif settings.openrouter_api_key:
             self.openai_client = OpenAI(
                 base_url="https://openrouter.ai/api/v1",
