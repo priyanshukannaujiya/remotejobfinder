@@ -2,8 +2,8 @@ name: Daily Job Scraper
 
 on:
   schedule:
-    # Run every hour at the 30-minute mark (so the 04:30 UTC run is exactly 10:00 AM IST)
-    - cron: '30 * * * *'
+    # Run once a day (04:30 UTC is exactly 10:00 AM IST)
+    - cron: '30 4 * * *'
   workflow_dispatch:
 
 jobs:
@@ -27,6 +27,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           playwright install chromium
+          playwright install-deps
 
       - name: Run Job Hunter
         env:
@@ -44,7 +45,8 @@ jobs:
           git config --global user.email 'github-actions@github.com'
           git add data/
           git commit -m "Automated data update: $(date)" || exit 0
-          git push
+          git pull --rebase origin main || { echo "Git pull/rebase failed"; exit 1; }
+          git push || { echo "Git push failed"; exit 1; }
 
       - name: Send Pipeline Failure Alert
         if: failure()
