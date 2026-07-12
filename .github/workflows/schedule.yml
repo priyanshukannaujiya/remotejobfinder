@@ -1,9 +1,6 @@
 name: Daily Job Scraper
 
 on:
-  push:
-    branches:
-      - main
   schedule:
     # Run once a day (04:30 UTC is exactly 10:00 AM IST)
     - cron: '30 4 * * *'
