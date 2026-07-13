@@ -151,10 +151,9 @@ def run_job_hunter():
         if now_utc.hour >= 4 and last_jobs_date != current_date:
             logger.info("It's past 10:00 AM IST. Sending daily jobs batch report...")
             todays_jobs = db_manager.get_todays_jobs()
-            if todays_jobs:
-                email_sender.send_report(todays_jobs)
-            else:
-                logger.info("No jobs found today to send in the daily report.")
+            email_sender.send_report(todays_jobs)
+            if not todays_jobs:
+                logger.info("Sent empty job report because 0 jobs were found.")
             with open(last_jobs_file, "w") as f:
                 f.write(current_date)
         elif last_jobs_date != current_date:

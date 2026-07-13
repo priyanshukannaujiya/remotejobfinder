@@ -15,18 +15,20 @@ def main():
 
     logger.info("Fetching today's jobs...")
     todays_jobs = db_manager.get_todays_jobs()
-    if todays_jobs:
-        logger.info(f"Found {len(todays_jobs)} jobs. Fetching latest Data Engineering news...")
-        news = NewsFetcher.get_latest_news(limit=3)
+    
+    logger.info(f"Found {len(todays_jobs)} jobs. Fetching latest Data Engineering news...")
+    news = NewsFetcher.get_latest_news(limit=3)
+    
+    logger.info("Sending report...")
+    email_sender = EmailSender()
+    email_sender.send_report(todays_jobs)
+    if news:
+        email_sender.send_news_newsletter(news)
         
-        logger.info("Sending report...")
-        email_sender = EmailSender()
-        email_sender.send_report(todays_jobs)
-        if news:
-            email_sender.send_news_newsletter(news)
-        logger.info("Done sending email!")
-    else:
-        logger.info("No jobs found today to send in the daily report.")
+    if not todays_jobs:
+        logger.info("Sent empty job report because 0 jobs were found.")
+        
+    logger.info("Done sending email!")
 
 if __name__ == "__main__":
     main()

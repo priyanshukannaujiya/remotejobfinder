@@ -21,7 +21,23 @@ class EmailSender:
 
     def generate_html_report(self, jobs: List[Dict]) -> str:
         if not jobs:
-            return "<h2>No new jobs found today.</h2>"
+            return """
+            <html>
+            <head>
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                    .summary-box { background-color: #f4f4f4; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+                </style>
+            </head>
+            <body>
+                <h2>Daily Data Engineering Jobs Report</h2>
+                <div class="summary-box">
+                    <h3 style="color: #d9534f; margin-top: 0;">0 New Jobs Found Today</h3>
+                    <p>The job scraper ran successfully, but no new jobs matching your criteria were posted in the last 24 hours.</p>
+                </div>
+            </body>
+            </html>
+            """
 
         total_jobs = len(jobs)
         remote_jobs = sum(1 for j in jobs if j.get("remote"))
@@ -82,10 +98,6 @@ class EmailSender:
         return html
 
     def send_report(self, jobs: List[Dict]):
-        if not jobs:
-            logger.info("No jobs to email.")
-            return
-
         recipients = [
             self.email,
             "atharvbhosale03@gmail.com",
