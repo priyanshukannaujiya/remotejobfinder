@@ -128,19 +128,20 @@ class EmailSender:
         html_content = self.generate_html_report(jobs)
         msg.attach(MIMEText(html_content, "html"))
 
-        # Attach CSV
-        csv_path = os.path.join(data_dir, "jobs.csv")
-        if os.path.exists(csv_path):
-            with open(csv_path, "rb") as f:
-                part = MIMEApplication(f.read(), Name="jobs.csv")
-                part["Content-Disposition"] = 'attachment; filename="jobs.csv"'
-                msg.attach(part)
+        # Attach CSV if there are new jobs
+        if jobs:
+            csv_path = os.path.join(data_dir, "jobs.csv")
+            if os.path.exists(csv_path):
+                with open(csv_path, "rb") as f:
+                    part = MIMEApplication(f.read(), Name="jobs.csv")
+                    part["Content-Disposition"] = 'attachment; filename="jobs.csv"'
+                    msg.attach(part)
 
         import time
         max_retries = 3
         for attempt in range(max_retries):
             try:
-                server = smtplib.SMTP(self.smtp_server, self.smtp_port, timeout=60)
+                server = smtplib.SMTP(self.smtp_server, self.smtp_port, timeout=120)
                 server.starttls()
                 server.login(self.email, self.password)
                 server.send_message(msg)
