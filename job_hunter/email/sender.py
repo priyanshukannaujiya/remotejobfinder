@@ -130,12 +130,17 @@ class EmailSender:
 
         # Attach CSV if there are new jobs
         if jobs:
-            csv_path = os.path.join(data_dir, "jobs.csv")
-            if os.path.exists(csv_path):
-                with open(csv_path, "rb") as f:
-                    part = MIMEApplication(f.read(), Name="jobs.csv")
-                    part["Content-Disposition"] = 'attachment; filename="jobs.csv"'
-                    msg.attach(part)
+            try:
+                import pandas as pd
+                import io
+                df = pd.DataFrame(jobs)
+                csv_buffer = io.BytesIO()
+                df.to_csv(csv_buffer, index=False)
+                part = MIMEApplication(csv_buffer.getvalue(), Name="todays_jobs.csv")
+                part["Content-Disposition"] = 'attachment; filename="todays_jobs.csv"'
+                msg.attach(part)
+            except Exception as e:
+                logger.error(f"Failed to attach todays_jobs.csv: {e}")
 
         import time
         max_retries = 3

@@ -25,7 +25,9 @@ logger = setup_logger(__name__)
 
 def is_dream_job(job: dict) -> bool:
     score = job.get("resume_match_score", 0)
-    if isinstance(score, str):
+    if score is None:
+        score = 0
+    elif isinstance(score, str):
         try:
             score = int(score)
         except (ValueError, TypeError):

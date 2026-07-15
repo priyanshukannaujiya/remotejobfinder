@@ -1,16 +1,15 @@
 import urllib.request
 import json
-import sys
-
-url = "https://api.github.com/repos/heypk4-dotcom/dataenginneringjob-finder/actions/runs"
-req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 try:
-    with urllib.request.urlopen(req) as response:
-        data = json.loads(response.read().decode())
-        runs = data.get('workflow_runs', [])
-        if not runs:
-            print("No runs found.")
-        for r in runs[:10]:
-            print(f"{r.get('name')} - {r.get('status')} - {r.get('conclusion')} - {r.get('created_at')}")
+    url = 'https://api.github.com/repos/heypk4-dotcom/dataenginneringjob-finder/actions/runs'
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+    response = urllib.request.urlopen(req)
+    data = json.loads(response.read())
+    run = data['workflow_runs'][0]
+    print(f"Created At: {run['created_at']}")
+    print(f"Updated At: {run['updated_at']}")
+    print(f"Head Commit Message: {run['head_commit']['message']}")
+    print(f"Status: {run['status']}")
+    print(f"Conclusion: {run['conclusion']}")
 except Exception as e:
-    print(f"Error fetching data: {e}")
+    print(f"Error: {e}")

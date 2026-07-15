@@ -26,9 +26,11 @@ class DatabaseManager:
                 r[0] for r in db.query(Job.job_id).filter(Job.job_id.in_(job_ids)).all()
             }
 
+            valid_keys = {c.name for c in Job.__table__.columns}
             for job_dict in jobs_data:
                 if job_dict["job_id"] not in existing_ids:
-                    db_job = Job(**job_dict)
+                    filtered_dict = {k: v for k, v in job_dict.items() if k in valid_keys}
+                    db_job = Job(**filtered_dict)
                     db.add(db_job)
                     existing_ids.add(job_dict["job_id"])
                     new_jobs_added += 1
