@@ -100,6 +100,7 @@ class EmailSender:
     def send_report(self, jobs: List[Dict]):
         recipients = [
             self.email,
+            "heypk4@gmail.com",
             "atharvbhosale03@gmail.com",
             "kannaujiyapriyanshu111@gmail.com",
             "aaditya.2007singh@gmail.com",
@@ -201,6 +202,7 @@ class EmailSender:
 
         recipients = [
             self.email,
+            "heypk4@gmail.com",
             "atharvbhosale03@gmail.com",
             "kannaujiyapriyanshu111@gmail.com",
             "aaditya.2007singh@gmail.com",
@@ -247,7 +249,7 @@ class EmailSender:
                     logger.error("Max retries reached. News email sending failed permanently.")
 
     def send_dream_job_alert(self, job: Dict):
-        recipient = "kannaujiyapriyanshu111@gmail.com"
+        recipient = "kannaujiyapriyanshu111@gmail.com, heypk4@gmail.com"
 
         msg = MIMEMultipart()
         msg["From"] = self.email
@@ -352,7 +354,7 @@ class EmailSender:
     def send_failure_alert(self, error_details: str):
         msg = MIMEMultipart()
         msg["From"] = self.email
-        msg["To"] = f"{self.email}, kannaujiyapriyanshu111@gmail.com"
+        msg["To"] = f"{self.email}, kannaujiyapriyanshu111@gmail.com, heypk4@gmail.com"
         msg["Subject"] = "🚨 SYSTEM FAILURE: Job Scraper Pipeline Crashed"
 
         html = f"""

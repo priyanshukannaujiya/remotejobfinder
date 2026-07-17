@@ -25,6 +25,7 @@ APScheduler
 pydantic
 pydantic-settings
 python-dotenv
+PyGithub
 
 # Dev tools
 pytest

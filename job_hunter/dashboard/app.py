@@ -314,6 +314,36 @@ with st.sidebar.form(key="subscribe_form"):
                     with open(subscribers_file, "w") as f:
                         json.dump(subscribers, f, indent=4)
                     
+                    # Try to save to GitHub if token is available
+                    try:
+                        from github import Github
+                        # Get secrets safely (handles local dev where st.secrets might not be configured)
+                        gh_token = None
+                        try:
+                            gh_token = st.secrets.get("GITHUB_TOKEN")
+                        except FileNotFoundError:
+                            pass
+                            
+                        if gh_token:
+                            g = Github(gh_token)
+                            repo = g.get_repo("priyanshukannaujiya/remotejobfinder")
+                            try:
+                                contents = repo.get_contents("data/subscribers.json")
+                                repo.update_file(
+                                    contents.path,
+                                    "Add new subscriber via web app",
+                                    json.dumps(subscribers, indent=4),
+                                    contents.sha
+                                )
+                            except Exception: # File might not exist yet
+                                repo.create_file(
+                                    "data/subscribers.json",
+                                    "Create subscribers file via web app",
+                                    json.dumps(subscribers, indent=4)
+                                )
+                    except Exception as gh_e:
+                        st.warning("Note: Saved locally but could not sync to GitHub. Make sure GITHUB_TOKEN is set in Streamlit Secrets.")
+
                     # Send welcome email
                     try:
                         from job_hunter.email.sender import EmailSender
