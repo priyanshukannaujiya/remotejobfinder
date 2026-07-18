@@ -136,8 +136,8 @@ def run_job_hunter():
 
         email_sender = EmailSender()
 
-        # News logic (10:00 AM IST / hour >= 4)
-        if now_utc.hour >= 4 and last_news_date != current_date:
+        # News logic (Email sending gated to at least 02:00 UTC / 7:30 AM IST)
+        if now_utc.hour >= 2 and last_news_date != current_date:
             logger.info("It's past 10:00 AM IST. Fetching and sending Data Engineering news...")
             news = NewsFetcher.get_latest_news(limit=3)
             if news:
@@ -149,8 +149,8 @@ def run_job_hunter():
         else:
             logger.info("News report already sent for today.")
                 
-        # Jobs logic (10:00 AM IST / hour >= 4)
-        if now_utc.hour >= 4 and last_jobs_date != current_date:
+        # Jobs logic (Email sending gated to at least 02:00 UTC / 7:30 AM IST)
+        if now_utc.hour >= 2 and last_jobs_date != current_date:
             logger.info("It's past 10:00 AM IST. Sending daily jobs batch report...")
             todays_jobs = db_manager.get_todays_jobs()
             email_sender.send_report(todays_jobs)

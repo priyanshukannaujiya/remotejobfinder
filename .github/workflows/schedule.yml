@@ -2,8 +2,9 @@ name: Daily Job Scraper
 
 on:
   schedule:
-    # Run once a day (04:30 UTC is exactly 10:00 AM IST)
-    - cron: '30 4 * * *'
+    # Run earlier to account for GitHub Actions queuing delays and 2-hour scraping time.
+    # 02:17 UTC is 07:47 AM IST. Using an off-peak minute (17) reduces GitHub delays.
+    - cron: '17 2 * * *'
   workflow_dispatch:
 
 jobs:
